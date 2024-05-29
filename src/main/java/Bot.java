@@ -18,6 +18,7 @@ public class Bot extends TelegramLongPollingBot {
     private InlineKeyboardMarkup keyboardM1;
     private InlineKeyboardMarkup keyboardM2;
 
+
     @Override
     public String getBotUsername() {
         return "qwer1210_bot";
@@ -34,8 +35,10 @@ public class Bot extends TelegramLongPollingBot {
         User user = message.getFrom();
         Long id = user.getId();
         System.out.println("Name \"" + user.getFirstName() + "\" wrote \"" + message.getText() + "\"" + " witch id \"" + id + "\"");
-//        sendMessage(id, message.getText());
-        copyMessage(id, message.getMessageId());
+//      sendMessage(id, message.getText());
+//      copyMessage(id, message.getMessageId());
+        buttonsAndKeyboard(message, id);
+
     }
 
     public void sendMessage(Long who, String what) {
@@ -63,6 +66,7 @@ public class Bot extends TelegramLongPollingBot {
             throw new RuntimeException(tae);
         }
     }
+
     public void sendMenu(Long who, String txt, InlineKeyboardMarkup kd2) {
         SendMessage sm = SendMessage.builder().chatId(who.toString())
                 .parseMode("HTML").text(txt).
@@ -72,6 +76,43 @@ public class Bot extends TelegramLongPollingBot {
             execute(sm);
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
+        }
+
+    }
+
+    public void buttonsAndKeyboard(Message msg, Long id) {
+
+        var next = InlineKeyboardButton.builder()
+                .text("Next").callbackData("next")
+                .build();
+
+        var back = InlineKeyboardButton.builder()
+                .text("Back").callbackData("back")
+                .build();
+
+        var url = InlineKeyboardButton.builder()
+                .text("Tutorial")
+                .url("https://core.telegram.org/bots/api")
+                .build();
+
+        /*keyboardM1 = InlineKeyboardMarkup.builder()
+                .keyboardRow(List.of(next)).build();*/
+
+        keyboardM2 = InlineKeyboardMarkup.builder()
+                .keyboardRow(List.of(back))
+                .keyboardRow(List.of(url))
+                .keyboardRow(List.of(next))
+                .build();
+
+        var txt = msg.getText();
+        if (msg.isCommand()) {
+            if (txt.equals("/scream"))
+                screaming = true;
+            else if (txt.equals("/whisper"))
+                screaming = false;
+            else if (txt.equals("/menu"))
+                sendMenu(id, "<b>Menu 1</b>", keyboardM2);
+
         }
     }
 }
